@@ -1,26 +1,36 @@
-# 乐语匣子音乐平台
+# 乐语匣子 - 后端服务
 
-一个完整的音乐平台项目，包含管理后台、小程序端。
+## 环境要求
 
-## 项目组成
+- **Java 21** (必须)
+- **Maven 3.6+**
+- **MySQL 8.0+**
 
-| 项目 | 类型 | 技术栈 | 端口 |
-|------|------|--------|------|
-| leyu-admin-backend | 后端服务 | Spring Boot 3.2 + MyBatis-Plus + MySQL | 8080 |
-| leyu-admin-web | 管理后台 | Vue.js (待开发) | 8081 |
-| miniprogram | 微信小程序 | 原生小程序 | - |
+## 技术栈
 
-## 快速部署指南
+- Spring Boot 3.2.2
+- MyBatis-Plus 3.5.5
+- Spring Security 6
+- JWT (jjwt 0.12.5)
+- Knife4j (OpenAPI 3)
 
-### 环境要求
+## 快速开始
 
-- **Java 21** (后端，必须)
-- **Maven 3.6+** (后端)
-- **MySQL 8.0+** (数据库)
-- **Node.js 16+** (管理后台)
-- **微信开发者工具** (小程序)
+### 1. 安装依赖
 
-### 步骤 1: 初始化数据库
+```bash
+# macOS
+brew install openjdk@21
+brew install maven
+
+# Ubuntu/Debian
+sudo apt install openjdk-21-jdk maven
+
+# CentOS/RHEL
+sudo yum install java-21-openjdk-devel maven
+```
+
+### 2. 创建数据库
 
 ```bash
 # 登录 MySQL
@@ -30,49 +40,94 @@ mysql -u root -p
 source docs/database_init.sql
 ```
 
-### 步骤 2: 启动后端服务
+或者手动创建:
+```sql
+CREATE DATABASE IF NOT EXISTS leyu_music DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 3. 修改配置
+
+编辑 `src/main/resources/application.yml`，修改数据库连接信息:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/leyu_music?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 你的密码
+```
+
+### 4. 编译运行
 
 ```bash
-cd leyu-admin-backend
+# 编译项目
+mvn clean package -DskipTests
 
-# 修改数据库配置 (如需要)
-vi src/main/resources/application.yml
+# 运行项目
+java -jar target/leyu-admin-backend-1.0.0.jar
+```
 
-# 编译并运行
+或者在开发环境直接运行:
+```bash
 mvn spring-boot:run
 ```
 
-后端启动成功后:
-- API 服务: http://localhost:8080
+### 5. 访问服务
+
+- 后端服务: http://localhost:8080
 - API 文档: http://localhost:8080/doc.html
-- 默认管理员: `admin` / `admin123`
 
-### 步骤 3: 运行小程序
+默认管理员账号: `admin` / `admin123`
 
-1. 打开微信开发者工具
-2. 导入 `miniprogram` 目录
-3. 使用测试 AppID 或真实 AppID
-4. 勾选「不校验合法域名」
-5. 点击编译运行
-
-## 已修复的问题
-
-- ✅ 小程序 TabBar 图标缺失
-- ✅ 数据库初始化脚本
-- ✅ 后端项目升级到 Java 21 / Spring Boot 3.2
-- ✅ javax.* → jakarta.* 包名迁移
-- ✅ Spring Security 6 配置更新
-- ✅ Swagger 2 → OpenAPI 3 注解迁移
-
-## 目录结构
+## 项目结构
 
 ```
-.
-├── docs/                    # 文档
-│   └── database_init.sql    # 数据库初始化脚本
-├── leyu-admin-backend/      # 后端服务 (Spring Boot 3 + Java 21)
-│   └── README.md            # 后端部署指南
-├── leyu-admin-web/          # 管理后台 (待开发)
-└── miniprogram/             # 微信小程序
-    └── README.md            # 小程序开发指南
+leyu-admin-backend/
+├── src/main/java/com/leyu/
+│   ├── config/          # 配置类
+│   ├── controller/      # 控制器
+│   ├── entity/          # 实体类
+│   ├── mapper/          # MyBatis Mapper
+│   ├── service/         # 服务层
+│   ├── vo/              # 视图对象
+│   ├── dto/             # 数据传输对象
+│   ├── security/        # 安全相关
+│   ├── utils/           # 工具类
+│   └── recommendation/   # 推荐算法
+└── src/main/resources/
+    ├── application.yml  # 配置文件
+    └── mapper/          # MyBatis XML
 ```
+
+## 已适配 Java 21 的变更
+
+- Spring Boot 3.2.2
+- javax.* → jakarta.* 包名迁移
+- Spring Security 6 新语法
+- Swagger 2 → OpenAPI 3 注解
+- jjwt 0.12.x 新 API
+
+## 常见问题
+
+### 1. Java 版本不正确
+
+错误信息: `unsupported class file major version 65`
+
+解决方案: 确保 Java 21 已安装并配置正确
+
+```bash
+java -version  # 应显示 21.x.x
+```
+
+### 2. Maven 未安装
+
+错误信息: `mvn: command not found`
+
+解决方案: 安装 Maven 3.6 或更高版本
+
+### 3. 数据库连接失败
+
+检查:
+- MySQL 服务是否启动
+- 数据库 `leyu_music` 是否存在
+- 用户名密码是否正确
